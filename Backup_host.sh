@@ -30,6 +30,47 @@ dbpass=""
 dbhost=""
 dbname=""
 
+## ----- Comprobar e instalar paquetes necesarios -----
+if [ ! -x /usr/bin/expect ]; then
+    echo "No tienes instalado el paquete \"expect\", vamos a instalarlo"
+    sudo pacman -Sy --noconfirm expect
+	clear
+	echo ""
+	echo "Paquete \"expect\" instalado correctamente"
+    sleep 4 && clear
+fi
+if [ ! -x /usr/bin/ssh ]; then
+    echo "No tienes instalado el paquete \"openssh\", vamos a instalarlo"
+    sudo pacman -Sy --noconfirm openssh
+	clear
+	echo ""
+	echo "Paquete \"openssh\" instalado correctamente"
+    sleep 4 && clear
+fi
+if [ ! -x /usr/bin/tar ]; then
+    echo "No tienes instalado el paquete \"tar\", vamos a instalarlo"
+    sudo pacman -Sy --noconfirm tar
+	clear
+	echo ""
+	echo "Paquete \"tar\" instalado correctamente"
+    sleep 4 && clear
+fi
+if [ ! -x /usr/bin/rsync ]; then
+    echo "No tienes instalado el paquete \"rsync\", vamos a instalarlo"
+    sudo pacman -Sy --noconfirm rsync
+	clear
+	echo ""
+	echo "Paquete \"rsync\" instalado correctamente"
+    sleep 4 && clear
+fi
+if [ ! -x /usr/bin/mysqldump ]; then
+    echo "No tienes instalado el paquete \"mariadb\", vamos a instalarlo"
+    sudo pacman -Sy --noconfirm mariadb
+	clear
+	echo ""
+	echo "Paquete \"mariadb\" instalado correctamente"
+    sleep 4 && clear
+fi
 # Introducimos en el remoto la llave pública ssh si no existe
 expect -c "
 	log_user 0

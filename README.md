@@ -14,5 +14,5 @@ También tenemos que crear unas carpetas en nuestra home para alojar las copias.
 
 En breve actualizaré el script para que las cree automáticamente en caso de no tenerlas creadas.
 
-También es necesario tener instalados los paquetes **expect, openssh, tar, rsync **y** mariadb**. En breve estos paquetes también se instalarán automáticamente en caso de no tenerlos.
+También es necesario tener instalados los paquetes **expect, openssh, tar, rsync** y **mariadb**. En breve estos paquetes también se instalarán automáticamente en caso de no tenerlos.
 
