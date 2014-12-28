@@ -71,6 +71,24 @@ if [ ! -x /usr/bin/mysqldump ]; then
 	echo "Paquete \"mariadb\" instalado correctamente"
     sleep 4 && clear
 fi
+
+## Comprobamos si tenemos los directorios para las copias, de lo contrario los crea
+if [ ! -x $localDescDB ];then
+	mkdir -p $localDescDB
+fi
+if [ ! -x $localDescHost ];then
+	mkdir -p $localDescHost
+fi
+if [ ! -x $LocalBackupDB ];then
+	mkdir -p $LocalBackupDB
+fi
+if [ ! -x $LocalBackupHost ];then
+	mkdir -p $LocalBackupHost
+fi
+if [ ! -x $localLogs ];then
+	mkdir -p $localLogs
+fi
+	
 # Introducimos en el remoto la llave pública ssh si no existe
 expect -c "
 	log_user 0
