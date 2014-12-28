@@ -53,11 +53,11 @@ find $localDescDB/ -mtime +$diasBorraSql -exec rm -rf {} \;
 find $LocalBackupDB/ -mtime +$diasBorraSqlGz -exec rm -rf {} \;
 
 # Descarga o actualiza carpeta desde host
-rsync -avz --delete --progress -e "ssh" $sshuser@$sshhost:$remoto $localDescHost >> $localLogs/backup$fecha.log 2>&1
+rsync -avz --delete --progress -e "ssh" $sshuser@$sshhost:$remoto $localDescHost >> $localLogs/backup-$fecha.log 2>&1
 
 # comprime la carpeta descargada del host
-tar -czf $LocalBackupHost/host$fecha.tar.gz $localDescHost
+tar -czf $LocalBackupHost/host-$fecha.tar.gz $localDescHost
 
 # Borra los archivos host más antiguos de la fecha especificada
-#find $localDescHost/ -mtime +$diasBorraHost -exec rm -rf {} \;
-find $LocalBackupHost/ -mtime +$diasBorraHostGz -exec rm -rf {} \;
+find $localDescHost/ -atime +$diasBorraHost -exec rm -rf {} \;
+find $LocalBackupHost/ -atime +$diasBorraHostGz -exec rm -rf {} \;
