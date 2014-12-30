@@ -5,16 +5,16 @@
 fecha=`date +%Y-%m-%d`
 diasBorraSql="15"
 diasBorraSqlGz="30"
-diasBorraHost="15"
-diasBorraHostGz="30"
+diasBorrawww="15"
+diasBorrawwwGz="30"
 # Rutas
 remoto=""
 remotoDB="Backups/DB"
-remotoHost="Backups/Host"
+remotowww="Backups/Host"
 localDescDB="$HOME/Backups/Desc/DB"
-localDescHost="$HOME/Backups/Desc/Host"
+localDescwww="$HOME/Backups/Desc/Host"
 LocalBackupDB="$HOME/Backups/DB"
-LocalBackupHost="$HOME/Backups/Host"
+LocalBackupwww="$HOME/Backups/Host"
 localLogs="$HOME/Backups/Logs"
 # Datos conexión ssh
 sshuser=""
