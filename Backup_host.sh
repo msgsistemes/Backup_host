@@ -1,5 +1,8 @@
 #!/bin/bash
 
+## Esta opción es para activar o desactivar las copias de respaldo al servidor ftp
+respaldoftp="si"
+
 ## ----- Variables -----
 # Fechas
 fecha=`date +%Y-%m-%d`
@@ -123,14 +126,19 @@ rsync -avz --delete --progress -e "ssh" --exclude 'Backups' $sshuser@$sshhost:$r
 # comprime la carpeta descargada del host
 tar -czf $LocalBackupwww/host-$fecha.tar.gz $localDescwww
 
-# Envia las copias comprimidas via ftp a nuestro espacio de respaldo en la nuve
-ftp -inv  $respftphost <<Done-ftp
-user $respftpuser $respftppass
-put $LocalBackupDB/$dbname-$fecha.sql.tar.gz $respftpDB/$dbname-$fecha.sql.tar.gz
-put $LocalBackupwww/host-$fecha.tar.gz $respftpwww/host-$fecha.tar.gz
-bye
+if [ $respaldoftp = si ]; then
+	# Envia las copias comprimidas via ftp a nuestro espacio de respaldo en la nuve
+	ftp -inv  $respftphost <<Done-ftp
+	user $respftpuser $respftppass
+	put $LocalBackupDB/$dbname-$fecha.sql.tar.gz $respftpDB/$dbname-$fecha.sql.tar.gz
+	put $LocalBackupwww/host-$fecha.tar.gz $respftpwww/host-$fecha.tar.gz
+	bye
 Done-ftp
-
+else
+	echo "No tienes configurado el respaldo por ftp"
+	sleep 5
+	clear
+fi	
 # Borra los archivos host más antiguos de la fecha especificada
 find $localDescwww/ -atime +$diasBorrawww -exec rm -rf {} \;
 find $LocalBackupwww/ -atime +$diasBorrawwwGz -exec rm -rf {} \;
