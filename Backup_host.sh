@@ -29,6 +29,12 @@ dbuser=""
 dbpass=""
 dbhost=""
 dbname=""
+# Datos respaldo ftp
+respftpuser=""
+respftppass=""
+respftphost=""
+respftpDB=""
+respftpwww=""
 
 ## ----- Comprobar e instalar paquetes necesarios -----
 if [ ! -x /usr/bin/expect ]; then
@@ -76,14 +82,14 @@ fi
 if [ ! -x $localDescDB ];then
 	mkdir -p $localDescDB
 fi
-if [ ! -x $localDescHost ];then
-	mkdir -p $localDescHost
+if [ ! -x $localDescwww ];then
+	mkdir -p $localDescwww
 fi
 if [ ! -x $LocalBackupDB ];then
 	mkdir -p $LocalBackupDB
 fi
-if [ ! -x $LocalBackupHost ];then
-	mkdir -p $LocalBackupHost
+if [ ! -x $LocalBackupwww ];then
+	mkdir -p $LocalBackupwww
 fi
 if [ ! -x $localLogs ];then
 	mkdir -p $localLogs
@@ -112,11 +118,19 @@ find $localDescDB/ -mtime +$diasBorraSql -exec rm -rf {} \;
 find $LocalBackupDB/ -mtime +$diasBorraSqlGz -exec rm -rf {} \;
 
 # Descarga o actualiza carpeta desde host
-rsync -avz --delete --progress -e "ssh" $sshuser@$sshhost:$remoto $localDescHost >> $localLogs/backup-$fecha.log 2>&1
+rsync -avz --delete --progress -e "ssh" --exclude 'Backups' $sshuser@$sshhost:$remoto $localDescwww >> $localLogs/backup-$fecha.log 2>&1
 
 # comprime la carpeta descargada del host
-tar -czf $LocalBackupHost/host-$fecha.tar.gz $localDescHost
+tar -czf $LocalBackupwww/host-$fecha.tar.gz $localDescwww
+
+# Envia las copias comprimidas via ftp a nuestro espacio de respaldo en la nuve
+ftp -inv  $respftphost <<Done-ftp
+user $respftpuser $respftppass
+put $LocalBackupDB/$dbname-$fecha.sql.tar.gz $respftpDB/$dbname-$fecha.sql.tar.gz
+put $LocalBackupwww/host-$fecha.tar.gz $respftpwww/host-$fecha.tar.gz
+bye
+Done-ftp
 
 # Borra los archivos host más antiguos de la fecha especificada
-find $localDescHost/ -atime +$diasBorraHost -exec rm -rf {} \;
-find $LocalBackupHost/ -atime +$diasBorraHostGz -exec rm -rf {} \;
+find $localDescwww/ -atime +$diasBorrawww -exec rm -rf {} \;
+find $LocalBackupwww/ -atime +$diasBorrawwwGz -exec rm -rf {} \;
