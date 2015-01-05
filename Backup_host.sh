@@ -1,19 +1,18 @@
 #!/bin/bash
 
 ## Esta opción es para activar o desactivar las copias de respaldo al servidor ftp
-respaldoftp="si"
+respaldoftp="no"
 
 ## ----- Variables -----
 # Fechas
 fecha=`date +%Y-%m-%d`
 diasBorraSql="15"
 diasBorraSqlGz="30"
-diasBorrawww="15"
 diasBorrawwwGz="30"
 # Rutas
-remoto=""
-remotoDB="Backups/DB"
-remotowww="Backups/Host"
+remoto="/"
+remotoDB="[No disponible]"
+remotowww="[No disponible]"
 localDescDB="$HOME/Backups/Desc/DB"
 localDescwww="$HOME/Backups/Desc/Host"
 LocalBackupDB="$HOME/Backups/DB"
@@ -40,46 +39,11 @@ respftpDB=""
 respftpwww=""
 
 ## ----- Comprobar e instalar paquetes necesarios -----
-if [ ! -x /usr/bin/expect ]; then
-    echo "No tienes instalado el paquete \"expect\", vamos a instalarlo"
-    sudo pacman -Sy --noconfirm expect
-	clear
-	echo ""
-	echo "Paquete \"expect\" instalado correctamente"
-    sleep 4 && clear
-fi
-if [ ! -x /usr/bin/ssh ]; then
-    echo "No tienes instalado el paquete \"openssh\", vamos a instalarlo"
-    sudo pacman -Sy --noconfirm openssh
-	clear
-	echo ""
-	echo "Paquete \"openssh\" instalado correctamente"
-    sleep 4 && clear
-fi
-if [ ! -x /usr/bin/tar ]; then
-    echo "No tienes instalado el paquete \"tar\", vamos a instalarlo"
-    sudo pacman -Sy --noconfirm tar
-	clear
-	echo ""
-	echo "Paquete \"tar\" instalado correctamente"
-    sleep 4 && clear
-fi
-if [ ! -x /usr/bin/rsync ]; then
-    echo "No tienes instalado el paquete \"rsync\", vamos a instalarlo"
-    sudo pacman -Sy --noconfirm rsync
-	clear
-	echo ""
-	echo "Paquete \"rsync\" instalado correctamente"
-    sleep 4 && clear
-fi
-if [ ! -x /usr/bin/mysqldump ]; then
-    echo "No tienes instalado el paquete \"mariadb\", vamos a instalarlo"
-    sudo pacman -Sy --noconfirm mariadb
-	clear
-	echo ""
-	echo "Paquete \"mariadb\" instalado correctamente"
-    sleep 4 && clear
-fi
+DEP=(" openssh mariadb expect tar rsync" )
+for d in $DEP; do
+	[ $( pacman -Qq "$d" 2> /dev/null ) ] && inst+="$d " || ninst+="$d "
+done
+sudo pacman --noconfirm -Sy $ninst
 
 ## Comprobamos si tenemos los directorios para las copias, de lo contrario los crea
 if [ ! -x $localDescDB ];then
@@ -140,5 +104,4 @@ else
 	clear
 fi	
 # Borra los archivos host más antiguos de la fecha especificada
-find $localDescwww/ -atime +$diasBorrawww -exec rm -rf {} \;
 find $LocalBackupwww/ -atime +$diasBorrawwwGz -exec rm -rf {} \;
