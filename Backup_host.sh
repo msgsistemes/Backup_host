@@ -1,66 +1,68 @@
 #!/bin/bash
+clear
 
-## Esta opción es para activar o desactivar las copias de respaldo al servidor ftp
-respaldoftp="no"
+## ########## VARIABLES ########## ##
 
-## ----- Variables -----
-# Fechas
-fecha=`date +%Y-%m-%d`
-diasBorraSql="15"
-diasBorraSqlGz="30"
-diasBorrawwwGz="30"
-# Rutas
-remoto="/"
-remotoDB="[No disponible]"
-remotowww="[No disponible]"
-localDescDB="$HOME/Backups/Desc/DB"
-localDescwww="$HOME/Backups/Desc/Host"
-LocalBackupDB="$HOME/Backups/DB"
-LocalBackupwww="$HOME/Backups/Host"
-localLogs="$HOME/Backups/Logs"
+# ---- OBLIGATORIAS QUE TENGAN CONTENIDO ---- #
+respaldoftp="no"						# Esta opción es para activar o desactivar las copias de respaldo al servidor ftp "si/no"
+remoto="/"								# Nombre del sitio que vamos a hacer las copias. En caso de ser raiz ponemos /
+direct=""								# Nombre del directorio que guardará las copias en local. Este se creará en nuestro home
+diasBorraSql="15"						# Días que guardará los archivos mysql
+diasBorraSqlGz="30"						# Días que guardará los archivos mysql comprimidos
+diasBorrawwwGz="30"						# Días que guardará los alchivos del host comprimidos
 # Datos conexión ssh
-sshuser=""
-sshpass=""
-sshhost=""
+sshuser=""								# Usuario para la conexión ssh
+sshpass=""								# Contraseña para la conexión ssh
+sshhost=""								# Dirección de conexión ssh de nuestro proveedor
 # Datos conexión ftp
-ftpuser=""
-ftppass=""
-ftphost=""
+ftpuser=""								# Usuario para la conexión ftp
+ftppass=""								# Contraseña para la conexión ftp
+ftphost=""								# Dirección de conexión ftp de nuestro proveedor
 # Datos conexión db
-dbuser=""
-dbpass=""
-dbhost=""
-dbname=""
+dbuser=""								# Usuario para la conexión mysql
+dbpass=""								# Contraseña para la conexión mysql
+dbhost=""								# Dirección de conexión mysql de nuestro proveedor
+dbname=""								# Nombre de la base de datos
+
+# ---- OPCIONALES ---- #
 # Datos respaldo ftp
-respftpuser=""
-respftppass=""
-respftphost=""
-respftpDB=""
-respftpwww=""
+respftpuser=""							# Usuario para la conexión de respaldo ftp
+respftppass=""							# Contraseña para la conexión de respaldo ftp
+respftphost=""							# Dirección de conexión respaldo ftp de nuestro proveedor
+respftpDB=""							# Ruta de respaldo en el ftp para base de datos
+respftpwww=""							# Ruta de respaldo en el ftp archivos del host
+
+# --------- ¡¡ NO MODIFICAR --- NO MODIFICAR !! ---------
+fecha=`date +%Y-%m-%d`
+dire="$HOME/Backups"
+localLogs="$dire/Logs"
+dir=(" $dire/${direct}_Desc/DB $dire/${direct}_Desc/www $dire/$direct/DB $dire/$direct/www $dire/Logs" )
+localLogs="$dire/Logs"
+dep=(" openssh mariadb expect tar rsync" )
+localDescDB="$dire/${direct}_Desc/DB"
+localDescwww="$dire/${direct}_Desc/www"
+LocalBackupDB="$dire/$direct/DB"
+LocalBackupwww="$dire/$direct/www"
+
+## ----- Comprobamos que las variables obligatorias estén completas ----- ##
+for var in respaldoftp direct remoto sshuser sshpass sshhost ftpuser ftppass ftphost dbuser dbpass dbhost dbname; do
+	if [ -z ${!var} ] ; then
+		echo "Para poder ejecutar el script debes rellenar las variables obligatorias"
+		exit
+	fi
+done
 
 ## ----- Comprobar e instalar paquetes necesarios -----
-DEP=(" openssh mariadb expect tar rsync" )
-for d in $DEP; do
+for d in $dep; do
 	[ $( pacman -Qq "$d" 2> /dev/null ) ] && inst+="$d " || ninst+="$d "
 done
 sudo pacman --noconfirm -Sy $ninst
 
 ## Comprobamos si tenemos los directorios para las copias, de lo contrario los crea
-if [ ! -x $localDescDB ];then
-	mkdir -p $localDescDB
-fi
-if [ ! -x $localDescwww ];then
-	mkdir -p $localDescwww
-fi
-if [ ! -x $LocalBackupDB ];then
-	mkdir -p $LocalBackupDB
-fi
-if [ ! -x $LocalBackupwww ];then
-	mkdir -p $LocalBackupwww
-fi
-if [ ! -x $localLogs ];then
-	mkdir -p $localLogs
-fi
+for f in $dir; do
+	[ -d $dir 2> /dev/null ] && direc+="$f " || ndirec+="$f "
+done
+mkdir -p $ndirec
 	
 # Introducimos en el remoto la llave pública ssh si no existe
 expect -c "
