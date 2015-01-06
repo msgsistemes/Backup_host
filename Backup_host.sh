@@ -38,7 +38,7 @@ dire="$HOME/Backups"
 localLogs="$dire/Logs"
 dir=(" $dire/${direct}_Desc/DB $dire/${direct}_Desc/www $dire/$direct/DB $dire/$direct/www $dire/Logs" )
 localLogs="$dire/Logs"
-dep=(" openssh mariadb expect tar rsync" )
+dep=(" openssh mariadb expect tar rsync curl" )
 localDescDB="$dire/${direct}_Desc/DB"
 localDescwww="$dire/${direct}_Desc/www"
 LocalBackupDB="$dire/$direct/DB"
@@ -63,6 +63,17 @@ for f in $dir; do
 	[ -d $dir 2> /dev/null ] && direc+="$f " || ndirec+="$f "
 done
 mkdir -p $ndirec
+
+# Crea la clave ssh si no está creada en nuestro equipo
+if [ ! -f $HOME/.ssh/id_rsa ]; then
+	ssh-keygen -t rsa -N "$sshpass" -f ~/.ssh/id_rsa -C ""
+	expect << EOF
+		spawn ssh-add $HOME/.ssh/id_rsa
+		expect "Enter passphrase for $HOME/.ssh/id_rsa:"
+		send "$sshpass\r"
+		expect eof
+EOF
+fi
 	
 # Introducimos en el remoto la llave pública ssh si no existe
 expect -c "
